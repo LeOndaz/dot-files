@@ -48,6 +48,7 @@
             "python:3.12-alpine"
             "python:3.10-alpine"
             "amazonlinux:latest"
+            container-registry.oracle.com/database/free/23.5.0.0-arm64
             )
 
             existing_images=()
@@ -67,13 +68,6 @@
             for image in "''${existing_images[@]}"; do
                 docker pull "$image"
             done
-        '';
-
-        postInstall = ''
-          python3.12 -m pip3 install virtualenv;
-          python3.12 -m pip3 install django;
-          python3.10 -m pip3 install virtualenv;
-          docker pull container-registry.oracle.com/database/free/23.5.0.0-arm64
         '';
       };
       # for installing .dmg urls
