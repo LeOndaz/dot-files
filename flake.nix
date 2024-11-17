@@ -2,8 +2,11 @@
   description = "Home Manager configuration with essential packages for M4 Pro Mini";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
-    home-manager.url = "github:nix-community/home-manager";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -15,60 +18,63 @@
     let
       # System configuration for aarch64-darwin (Apple Silicon)
       system = "aarch64-darwin";
-      pkgs = import nixpkgs { inherit system; };
+      pkgs = import nixpkgs { 
+        inherit system;
+        config.allowUnfree = true;
+      };
       stdenv = pkgs.stdenv;
       lib = pkgs.lib;
-      dockerImages = stdenv.mkDerivation{
-          name = "docker verify & pull";
-          buildInputs = [
-            pkgs.docker
-          ];
+      dockerImages = stdenv.mkDerivation {
+        name = "docker verify & pull";
+        buildInputs = [
+          pkgs.docker
+        ];
 
-          preBuild = ''
-            images=(
-              "postgis/postgis"
-              "postgis/postgis:17-3.5-alpine"
-              "mysql:9"
-              "redis:7-alpine"
-              "nginx:1-alpine"
-              "alpine:3.20"
-              "mongo:8-noble"
-              "alpine/jmeter"
-              "rabbitmq:4-alpine"
-              "node:23-alpine"
-              "node:22-alpine"
-              "node:20-alpine"
-              "python:3.13-alpine"
-              "python:3.12-alpine"
-              "python:3.10-alpine"
-              "amazonlinux:latest"
-              )
+        preBuild = ''
+          images=(
+            "postgis/postgis"
+            "postgis/postgis:17-3.5-alpine"
+            "mysql:9"
+            "redis:7-alpine"
+            "nginx:1-alpine"
+            "alpine:3.20"
+            "mongo:8-noble"
+            "alpine/jmeter"
+            "rabbitmq:4-alpine"
+            "node:23-alpine"
+            "node:22-alpine"
+            "node:20-alpine"
+            "python:3.13-alpine"
+            "python:3.12-alpine"
+            "python:3.10-alpine"
+            "amazonlinux:latest"
+            )
 
-              existing_images=()
+            existing_images=()
 
-              # Check if each image exists
-              for image in "''${images[@]}"; do
-                  if docker manifest inspect "$image" > /dev/null 2>&1; then
-                      echo "Image $image exists, scheduled for installing"
-                      existing_images+=("$image")
-                  else
-                      echo "Image $image does NOT exist or is not accessible"
-                  fi
-              done
+            # Check if each image exists
+            for image in "''${images[@]}"; do
+                if docker manifest inspect "$image" > /dev/null 2>&1; then
+                    echo "Image $image exists, scheduled for installing"
+                    existing_images+=("$image")
+                else
+                    echo "Image $image does NOT exist or is not accessible"
+                fi
+            done
 
-              # Pull each image that was confirmed to exist
-              echo "Starting to pull images..."
-              for image in "''${existing_images[@]}"; do
-                  docker pull "$image"
-              done
-          '';
+            # Pull each image that was confirmed to exist
+            echo "Starting to pull images..."
+            for image in "''${existing_images[@]}"; do
+                docker pull "$image"
+            done
+        '';
 
-          postInstall = ''
-            python3.12 -m pip3 install virtualenv;
-            python3.12 -m pip3 install django;
-            python3.10 -m pip3 install virtualenv;
-            docker pull container-registry.oracle.com/database/free/23.5.0.0-arm64
-          '';
+        postInstall = ''
+          python3.12 -m pip3 install virtualenv;
+          python3.12 -m pip3 install django;
+          python3.10 -m pip3 install virtualenv;
+          docker pull container-registry.oracle.com/database/free/23.5.0.0-arm64
+        '';
       };
       # for installing .dmg urls
       RemoteInstall =
@@ -135,107 +141,8 @@
       };
 
       homeConfigurations.leondaz = home-manager.lib.homeManagerConfiguration {
-        inherit pkgs system;
-        homeDirectory = "/Users/leondaz";
-        username = "leondaz";
-
-        configuration = {
-          programs.home-manager.enable = true;
-
-          home.packages = with pkgs; [
-            # Development Tools
-            autoconf
-            automake
-            aws-sdk-cpp
-            boost
-            cmake
-            eigen
-            gcc
-            git
-            git-lfs
-            gradle
-            llvm
-            neovim
-            nodejs
-            openjdk
-            openssl
-            protobuf
-
-            terraform
-            yarn
-            zlib
-            kubectl
-
-            # Libraries
-            cairo
-            freetype
-            gdal
-            glib
-            gmp
-            harfbuzz
-            hdf5
-            icu
-            jpeg
-            libarchive
-            libevent
-            libffi
-            libgit2
-            libpng
-            libpq
-            libssh
-            libxml2
-            libyaml
-            openssl
-            sqlite
-            xz
-            zstd
-
-            # Utilities
-            bat
-            brotli
-            bzip2
-            curl
-            fzf
-            gh
-            htop
-            httpie
-            jq
-            lz4
-            p7zip
-            tree
-            unzip
-            wget
-            xclip
-            zip
-
-            # Media Libraries
-            ffmpeg-full
-            flac
-            lame
-            libvpx
-            opus
-            x264
-            x265
-
-            # Programming Languages
-            lua
-            ruby
-            go
-            luajit
-            luarocks
-            python310
-            python312
-
-            # nix
-            nixfmt-rfc-style
-          ];
-
-          home.activation = {
-            bun = lib.hm.dag.entryAfter ["writeBoundary"] ''
-              curl -fsSL https://bun.sh/install | bash
-            '';
-          };
-        };
+        inherit pkgs;
+        modules = [ ./users/leondaz.nix ];
       };
     };
 }

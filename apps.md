@@ -15,3 +15,13 @@ wireshark
 postman
 insomnia
 obs-studio
+
+# libpq
+flac
+lame
+libvpx
+opus
+x264
+x265
+
+openjdk
