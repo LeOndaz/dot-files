@@ -3,12 +3,24 @@
   config,
   lib,
   system,
+  inputs,
   ...
-}:
-{
+}: {
   home.homeDirectory = "/Users/leondaz";
   home.stateVersion = "24.11";
   home.username = "leondaz";
+
+  nix = {
+    package = lib.mkDefault pkgs.nixVersions.latest;
+    registry =
+      (lib.mapAttrs (_: flake: {inherit flake;}))
+      ((lib.filterAttrs (_: lib.isType "flake")) inputs);
+    extraOptions = ''
+      min-free = ${toString (5 * 1024 * 1024 * 1024)}
+      max-free = ${toString (5 * 1024 * 1024 * 1024)}
+    ''; # when free space < 5GiB, try to free up to 5GiB
+  };
+
   programs.home-manager.enable = true;
 
   home.packages = with pkgs; [
