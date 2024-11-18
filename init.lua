@@ -78,6 +78,15 @@ vim.keymap.set(
   { desc = 'change to the void' }
 )
 
+-- Highlight on yank
+vim.api.nvim_create_autocmd('TextYankPost', {
+  desc = 'Highlight when yanking text',
+  callback = function()
+    vim.highlight.on_yank()
+  end,
+  group = vim.api.nvim_create_augroup('my-highlight-yank', { clear = true }),
+})
+
 -- built in
 --[[
 vim.api.nvim_create_autocmd('FileType', {
