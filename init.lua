@@ -32,6 +32,52 @@ vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
 vim.opt.foldtext = ''
 vim.opt.foldenable = false
 
+-- copied the maps from my config but changed the '+' buffer to '*', afaik this
+-- is the sensible clipboard buffer in mac
+vim.keymap.set({ 'n', 'v' }, '<leader>y', '"*y', { desc = 'yank to clipboard' })
+vim.keymap.set(
+  { 'n', 'v' },
+  '<leader>Y',
+  '"*y$',
+  { desc = 'yank to clipboard' }
+)
+vim.keymap.set(
+  { 'n', 'v' },
+  '<leader>p',
+  '"*p',
+  { desc = 'paste from clipboard' }
+)
+vim.keymap.set(
+  { 'n', 'v' },
+  '<leader>P',
+  '"*P',
+  { desc = 'paste from clipboard' }
+)
+vim.keymap.set(
+  { 'n', 'v' },
+  '<leader>d',
+  '"_d',
+  { desc = 'delete to the void' }
+)
+vim.keymap.set(
+  { 'n', 'v' },
+  '<leader>D',
+  '"_D',
+  { desc = 'delete to the void' }
+)
+vim.keymap.set(
+  { 'n', 'v' },
+  '<leader>c',
+  '"_c',
+  { desc = 'change to the void' }
+)
+vim.keymap.set(
+  { 'n', 'v' },
+  '<leader>C',
+  '"_C',
+  { desc = 'change to the void' }
+)
+
 -- built in
 --[[
 vim.api.nvim_create_autocmd('FileType', {
