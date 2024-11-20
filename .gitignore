@@ -1,3 +1,7 @@
 .idea
 .vscode
 result
+.venv
+node_modules
+dist
+build
