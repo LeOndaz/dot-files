@@ -150,7 +150,7 @@
 
     homeConfigurations.leondaz = home-manager.lib.homeManagerConfiguration {
       inherit pkgs;
-      modules = [./users/leondaz.nix];
+      modules = [./users/leondaz/leondaz.nix];
       extraSpecialArgs = {inherit inputs;};
     };
   };
