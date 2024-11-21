@@ -89,6 +89,9 @@ NEXT_MESSAGE_PROMPT = "This is the {index}th part"
 LAST_MESSAGE_PROMPT = "This is the last message"
 OUTPUT_PATH = Path("gptizer_op")
 
+IGNORED_DIRS = [
+    "node_modules", "dist", "build", str(OUTPUT_PATH), ".venv", "venv", ".git", "^.", Path(__file__).name,
+]
 
 def parse_arguments():
     """
@@ -125,7 +128,7 @@ def get_supported_files(directory: Path, ignore_dirs: List[str] = None) -> List[
     Returns:
         List[Path]: A list of file paths matching the supported extensions.
     """
-    ignore_dirs = ignore_dirs or ["node_modules", "dist", "build", str(OUTPUT_PATH)]
+    ignore_dirs = ignore_dirs or IGNORED_DIRS
     supported_files = []
     for path in directory.rglob("*"):
         # Skip ignored directories
@@ -169,7 +172,7 @@ def tokenize_content(content: str) -> int:
     Returns:
         int: The token count of the content.
     """
-    return len(ENCODER.encode(content))
+    return len(ENCODER.encode(content,  disallowed_special=()))
 
 
 def write_to_output_file(output_content: List[str], output_file: Path, append=False):
