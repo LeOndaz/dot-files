@@ -41,7 +41,7 @@
     gradle
     llvm
     neovim
-    nodejs
+    nodejs_23
     openssl
     protobuf
 
