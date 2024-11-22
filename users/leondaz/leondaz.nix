@@ -42,6 +42,7 @@
     llvm
     neovim
     nodejs_23
+    icu4c
     openssl
     protobuf
 
